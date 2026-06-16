@@ -1,0 +1,36 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.pdb
+*.cache
+*.db
+*.ide
+.vscode/
+*.log
+*.tmp
+*.DS_Store
+
+# Visual Studio Code workspace settings
+.vscode/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+
+# Build results
+*.dll
+*.exe
+*.app
+*.lib
+*.so
+*.a
+*.dylib
+
+# Test results
+TestResults/
+coverage*/
