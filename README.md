@@ -22,8 +22,9 @@ TaskMaster is a clean architecture task management solution implemented with .NE
 - The database file is created automatically at runtime.
 
 ## Authentication
+ JWT Bearer Auth + BCrypt password hashing
 - Authenticate with `POST /api/auth/login`.
-- Use the default credentials `admin` / `Password123!`.
+- Change default credentials in `appsettings.Development.json` before running
 - Send the returned JWT token in the `Authorization` header as `Bearer <token>`.
 - All `/api/tasks` routes require authorization.
 
