@@ -13,6 +13,6 @@ public sealed class UpdateTaskRequest
     public string? Description { get; init; }
 
     public DateTime? DueDate { get; init; }
-    public TaskStatus Status { get; init; } = TaskStatus.Backlog;
+    public TaskMaster.Domain.Entities.TaskStatus Status { get; init; } = TaskMaster.Domain.Entities.TaskStatus.Backlog;
 }
 

@@ -14,6 +14,7 @@ public sealed class TaskItem
     public string Title { get; private set; } = null!;
     public string? Description { get; private set; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; private set; }
     public DateTime? DueDate { get; private set; }
     public TaskStatus Status { get; private set; } = TaskStatus.Backlog;
 
@@ -37,6 +38,7 @@ public sealed class TaskItem
             : title.Trim();
         Description = description?.Trim();
         DueDate = dueDate;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void SetStatus(TaskStatus status)

@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TaskMaster.Application.Models;
 using TaskMaster.Application.Services;
 using TaskMaster.Infrastructure.Data;
@@ -10,11 +11,17 @@ namespace TaskMaster.Tests;
 
 public sealed class TaskServiceTests
 {
+    private static ILogger<TaskService> CreateNullLogger()
+    {
+        var loggerFactory = LoggerFactory.Create(builder => { });
+        return loggerFactory.CreateLogger<TaskService>();
+    }
+
     [Fact]
     public async Task CreateAsync_ShouldReturnCreatedTask()
     {
         var repository = new InMemoryTaskRepository();
-        var service = new TaskService(repository);
+        var service = new TaskService(repository, CreateNullLogger());
 
         var request = new CreateTaskRequest
         {
@@ -36,7 +43,7 @@ public sealed class TaskServiceTests
     public async Task DeleteAsync_ShouldRemoveTask()
     {
         var repository = new InMemoryTaskRepository();
-        var service = new TaskService(repository);
+        var service = new TaskService(repository, CreateNullLogger());
 
         var created = await service.CreateAsync(new CreateTaskRequest { Title = "Review architecture" });
         var deleted = await service.DeleteAsync(created.Id);
@@ -50,7 +57,7 @@ public sealed class TaskServiceTests
     public async Task GetAllAsync_WithStatusFilter_ShouldReturnMatchingTasks()
     {
         var repository = new InMemoryTaskRepository();
-        var service = new TaskService(repository);
+        var service = new TaskService(repository, CreateNullLogger());
 
         await service.CreateAsync(new CreateTaskRequest { Title = "Task 1" });
         var second = await service.CreateAsync(new CreateTaskRequest { Title = "Task 2" });
@@ -58,8 +65,8 @@ public sealed class TaskServiceTests
 
         var result = await service.GetAllAsync(new TaskQuery { Status = TaskMaster.Domain.Entities.TaskStatus.Completed });
 
-        Assert.Single(result);
-        Assert.Equal(TaskMaster.Domain.Entities.TaskStatus.Completed, result.First().Status);
+        Assert.Single(result.Items);
+        Assert.Equal(TaskMaster.Domain.Entities.TaskStatus.Completed, result.Items.First().Status);
     }
 
     [Fact]
@@ -76,7 +83,7 @@ public sealed class TaskServiceTests
         {
             await context.Database.EnsureCreatedAsync();
             var repository = new EfTaskRepository(context);
-            var service = new TaskService(repository);
+            var service = new TaskService(repository, CreateNullLogger());
 
             var request = new CreateTaskRequest { Title = "Persist task" };
             var created = await service.CreateAsync(request);

@@ -9,7 +9,7 @@ public sealed class TaskEntity
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? DueDate { get; set; }
-    public TaskStatus Status { get; set; }
+    public TaskMaster.Domain.Entities.TaskStatus Status { get; set; }
 
     public TaskItem ToDomain()
     {
