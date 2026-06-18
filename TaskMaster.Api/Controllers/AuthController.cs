@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using TaskMaster.Api.Models;
+using TaskMaster.Api.Security;
 using TaskMaster.Api.Services;
 
 namespace TaskMaster.Api.Controllers;
@@ -9,11 +11,19 @@ namespace TaskMaster.Api.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly IJwtTokenService _tokenService;
+    private readonly AuthSettings _authSettings;
+    private readonly JwtSettings _jwtSettings;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IJwtTokenService tokenService, ILogger<AuthController> logger)
+    public AuthController(
+        IJwtTokenService tokenService,
+        IOptions<AuthSettings> authOptions,
+        IOptions<JwtSettings> jwtOptions,
+        ILogger<AuthController> logger)
     {
         _tokenService = tokenService;
+        _authSettings = authOptions.Value;
+        _jwtSettings = jwtOptions.Value;
         _logger = logger;
     }
 
@@ -33,7 +43,7 @@ public sealed class AuthController : ControllerBase
             });
         }
 
-        var (isValid, email, name) = ValidateUser(request.Username, request.Password);
+        var isValid = ValidateUser(request.Username, request.Password);
         if (!isValid)
         {
             _logger.LogWarning("Login failed: Invalid credentials for user: {Username}", request.Username);
@@ -44,7 +54,7 @@ public sealed class AuthController : ControllerBase
             });
         }
 
-        var token = _tokenService.CreateToken(request.Username, email, name);
+        var token = _tokenService.CreateToken(_authSettings.Username, _authSettings.Email, _authSettings.Name);
         _logger.LogInformation("Login successful for user: {Username}", request.Username);
         
         return Ok(new ApiResponse<AuthResponse> 
@@ -52,20 +62,23 @@ public sealed class AuthController : ControllerBase
             Data = new AuthResponse
             {
                 Token = token,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(120)
+                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes)
             },
             Success = true,
             Message = "Login successful"
         });
     }
 
-    private static (bool IsValid, string Email, string Name) ValidateUser(string username, string password)
+    private bool ValidateUser(string username, string password)
     {
-        if (username == "admin" && password == "Password123!")
+        if (string.IsNullOrWhiteSpace(_authSettings.Username) ||
+            string.IsNullOrWhiteSpace(_authSettings.PasswordHash))
         {
-            return (true, "admin@example.com", "Admin User");
+            _logger.LogError("Login failed: Auth settings are not configured");
+            return false;
         }
 
-        return (false, string.Empty, string.Empty);
+        return string.Equals(username, _authSettings.Username, StringComparison.Ordinal) &&
+            BCrypt.Net.BCrypt.Verify(password, _authSettings.PasswordHash);
     }
 }

@@ -34,3 +34,9 @@ packages/
 # Test results
 TestResults/
 coverage*/
+
+# Runtime logs
+TaskMaster.Api/logs/
+
+# Local application secrets
+appsettings.Development.json

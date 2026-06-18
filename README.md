@@ -22,13 +22,59 @@ TaskMaster is a clean architecture task management solution implemented with .NE
 - The database file is created automatically at runtime.
 
 ## Authentication
- JWT Bearer Auth + BCrypt password hashing
+JWT Bearer Auth + BCrypt password hashing.
 - Authenticate with `POST /api/auth/login`.
-- Change default credentials in `appsettings.Development.json` before running
+- Configure credentials outside source control before running or deploying.
 - Send the returned JWT token in the `Authorization` header as `Bearer <token>`.
 - All `/api/tasks` routes require authorization.
+
+Required auth configuration:
+- `Auth__Username`
+- `Auth__PasswordHash` — BCrypt hash of the password
+- `Auth__Email`
+- `Auth__Name`
+- `Jwt__Key`
+- `Jwt__Issuer`
+- `Jwt__Audience`
+- `Jwt__ExpiryMinutes`
+
+Example PowerShell session for local development:
+```powershell
+$env:Auth__Username = "admin"
+$env:Auth__PasswordHash = "<bcrypt-password-hash>"
+$env:Auth__Email = "admin@example.com"
+$env:Auth__Name = "Admin User"
+$env:Jwt__Key = "<long-random-secret-key>"
+$env:Jwt__Issuer = "TaskMasterApi"
+$env:Jwt__Audience = "TaskMasterUsers"
+$env:Jwt__ExpiryMinutes = "120"
+```
 
 ## Search and pagination
 - Use query parameters on `GET /api/tasks`.
 - Supported filters: `searchTerm`, `status`, `dueBefore`, `pageNumber`, `pageSize`.
 - Example: `/api/tasks?searchTerm=architecture&pageNumber=1&pageSize=10`.
+
+## Deployment
+- Health check endpoint: `GET /health`.
+- The Docker image listens on port `8080`.
+- In Docker, the default database path is `/app/data/taskmaster.db`.
+
+Build the image:
+```powershell
+docker build -t taskmaster-api .
+```
+
+Run the container:
+```powershell
+docker run --rm -p 8080:8080 `
+  -e Auth__Username="admin" `
+  -e Auth__PasswordHash="<bcrypt-password-hash>" `
+  -e Auth__Email="admin@example.com" `
+  -e Auth__Name="Admin User" `
+  -e Jwt__Key="<long-random-secret-key>" `
+  -e Jwt__Issuer="TaskMasterApi" `
+  -e Jwt__Audience="TaskMasterUsers" `
+  -e Jwt__ExpiryMinutes="120" `
+  taskmaster-api
+```

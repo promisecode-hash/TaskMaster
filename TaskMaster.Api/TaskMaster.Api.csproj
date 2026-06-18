@@ -1,18 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8dd0c4f5-01a7-42f1-9c8d-a3f300022aee</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\TaskMaster.Application\TaskMaster.Application.csproj" />
     <ProjectReference Include="..\TaskMaster.Infrastructure\TaskMaster.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.15.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>

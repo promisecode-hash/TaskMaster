@@ -25,6 +25,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -99,5 +100,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }))
+    .AllowAnonymous();
 app.MapControllers();
 app.Run();
